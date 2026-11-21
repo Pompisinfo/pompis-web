@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pompis — Comparador de pañales y toallitas en España | Próximamente</title>
+  <meta name="description" content="Ahorra en cada cambio de pañal. Pompis compara el precio por unidad de pañales y toallitas en Amazon, PromoFarma, Atida, Carrefour y más tiendas de España." />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- SDK oficial de Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Configuración personalizada de Tailwind para la paleta de Pompis -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            crema: '#FFF8F0',
+            rosa: '#FFB6C1',
+            rosaSuave: '#FFE4E8',
+            marron: '#5D4037',
+            marronClaro: '#8D6E63',
+            verdeAhorro: '#2E7D32',
+            verdeFondo: '#E8F5E9',
+            dorado: '#F59E0B',
+            doradoClaro: '#FDE047',
+          },
+          boxShadow: {
+            suave: '0 10px 30px -10px rgba(93, 64, 55, 0.12)',
+            tarjeta: '0 4px 14px -2px rgba(93, 64, 55, 0.08)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-crema text-marron font-sans antialiased selection:bg-rosa selection:text-marron min-h-screen flex flex-col">
+
+  <!-- ================= CABECERA ================= -->
+  <header class="w-full sticky top-0 z-30 bg-crema/90 backdrop-blur-md border-b border-rosa/30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+      <!-- Logo y Nombre -->
+      <a href="#" class="flex items-center gap-2.5 group">
+        <div class="w-11 h-11 rounded-2xl bg-rosa flex items-center justify-center shadow-sm border border-marron/10 group-hover:scale-105 transition-transform">
+          <!-- Logotipo SVG: Carita de bebé sonriente con moneda dorada (€) -->
+          <svg class="w-10 h-10" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logotipo Pompis: carita de bebé con moneda de euro">
+            <!-- Orejitas -->
+            <circle cx="6.5" cy="24" r="3" fill="#FFE8DC" stroke="#5D4037" stroke-width="2"/>
+            <circle cx="33.5" cy="24" r="3" fill="#FFE8DC" stroke="#5D4037" stroke-width="2"/>
+            <!-- Carita redondeada del bebé -->
+            <circle cx="20" cy="24" r="13.5" fill="#FFE8DC" stroke="#5D4037" stroke-width="2.2"/>
+            <!-- Rizito de pelo arriba -->
+            <path d="M17.5 10.6C16.6 5.4 24.4 5 23 9.8C22.2 11.4 20 10.8 20.8 9" stroke="#5D4037" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Ojos sonrientes -->
+            <path d="M13.5 23Q15.5 20.5 17.5 23" stroke="#5D4037" stroke-width="2.1" stroke-linecap="round" fill="none"/>
+            <path d="M22.5 23Q24.5 20.5 26.5 23" stroke="#5D4037" stroke-width="2.1" stroke-linecap="round" fill="none"/>
+            <!-- Mofletes sonrosados -->
+            <ellipse cx="11.8" cy="26.5" rx="2.3" ry="1.4" fill="#FFB6C1"/>
+            <ellipse cx="28.2" cy="26.5" rx="2.3" ry="1.4" fill="#FFB6C1"/>
+            <!-- Sonrisa dulce -->
+            <path d="M16.8 28.2Q20 31.6 23.2 28.2" stroke="#5D4037" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <!-- Moneda dorada (€) en la esquina inferior derecha -->
+            <circle cx="35.5" cy="34.5" r="9.5" fill="url(#monedaGradHeader)" stroke="#5D4037" stroke-width="2"/>
+            <circle cx="35.5" cy="34.5" r="6.8" stroke="#FFF8F0" stroke-width="1" stroke-dasharray="2 1.8" opacity="0.8"/>
+            <text x="35.5" y="38.5" text-anchor="middle" fill="#5D4037" font-family="Inter, sans-serif" font-weight="800" font-size="11.5">€</text>
+            <defs>
+              <linearGradient id="monedaGradHeader" x1="27" y1="26" x2="44" y2="43" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#FDE047"/>
+                <stop offset="1" stop-color="#F59E0B"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="text-2xl font-extrabold tracking-tight text-marron">Pompis</span>
+      </a>
+
+      <!-- Badge Próximamente -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rosaSuave border border-rosa text-marron text-xs font-bold tracking-wider uppercase">
+        <span class="w-2 h-2 rounded-full bg-verdeAhorro animate-pulse"></span>
+        PRÓXIMAMENTE
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= CONTENIDO PRINCIPAL ================= -->
+  <main class="flex-grow">
+
+    <!-- HERO + VISTA PREVIA -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16 sm:pt-16 sm:pb-24">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+
+        <!-- Columna Izquierda: Copy + Formulario Lista de Espera -->
+        <div class="lg:col-span-7 text-center lg:text-left">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-rosa/60 text-marron text-xs sm:text-sm font-semibold mb-6 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-dorado"></span>
+            <span>Próximamente en iOS y Android • España 🇪🇸</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-marron leading-[1.1] mb-6">
+            Ahorra en cada <span class="relative inline-block">
+              <span class="relative z-10">cambio de pañal</span>
+              <span class="absolute bottom-1 left-0 w-full h-3 sm:h-4 bg-rosa/60 -z-0 rounded-full"></span>
+            </span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-marronClaro leading-relaxed max-w-2xl mx-auto lg:mx-0 mb-8">
+            Olvídate de hacer cálculos con packs de 48, 96 o 168 unidades. <strong class="text-marron font-semibold">Pompis</strong> compara al segundo el <strong class="text-marron font-semibold">precio real por unidad</strong> de pañales y toallitas en Amazon, PromoFarma, Atida, Carrefour y más tiendas online de España.
+          </p>
+
+          <!-- Formulario de Lista de Espera -->
+          <div class="max-w-md mx-auto lg:mx-0">
+            <form id="waitlist-form" class="flex flex-col sm:flex-row gap-3" novalidate>
+              <label for="email-input" class="sr-only">Tu correo electrónico</label>
+              <input
+                id="email-input"
+                type="email"
+                required
+                placeholder="tu@email.com"
+                class="flex-grow px-4 py-3.5 rounded-2xl bg-white border-2 border-rosa/60 text-marron placeholder-marronClaro/60 focus:outline-none focus:border-marron transition-colors text-base shadow-sm"
+              />
+              <button
+                id="submit-btn"
+                type="submit"
+                class="px-6 py-3.5 rounded-2xl bg-marron text-crema font-bold text-base hover:bg-marron/90 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-suave whitespace-nowrap cursor-pointer"
+              >
+                Avísame al lanzar
+              </button>
+            </form>
+
+            <!-- Mensaje de estado / confirmación interactiva -->
+            <div id="form-feedback" class="hidden mt-3 p-3.5 rounded-2xl text-sm font-medium text-left transition-all" role="alert"></div>
+
+            <p class="mt-3 text-xs text-marronClaro/80">
+              Sin spam. Solo te escribiremos una vez cuando Pompis esté disponible en iOS y Android.
+            </p>
+          </div>
+
+          <!-- Tiendas destacadas -->
+          <div class="mt-10 pt-6 border-t border-rosa/30">
+            <p class="text-xs font-semibold uppercase tracking-wider text-marronClaro/80 mb-3">
+              Rastreando ofertas en tiendas de confianza
+            </p>
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-xs sm:text-sm font-semibold text-marron/80">
+              <span class="px-3 py-1.5 rounded-xl bg-white border border-rosa/30 shadow-sm">Amazon</span>
+              <span class="px-3 py-1.5 rounded-xl bg-white border border-rosa/30 shadow-sm">PromoFarma</span>
+              <span class="px-3 py-1.5 rounded-xl bg-white border border-rosa/30 shadow-sm">Atida | Mifarma</span>
+              <span class="px-3 py-1.5 rounded-xl bg-white border border-rosa/30 shadow-sm">Carrefour</span>
+              <span class="px-3 py-1.5 rounded-xl bg-white border border-rosa/30 shadow-sm">+ más tiendas</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Vista previa visual de la App -->
+        <div class="lg:col-span-5">
+          <div class="relative mx-auto max-w-sm">
+            <!-- Halo decorativo trasero -->
+            <div class="absolute -inset-3 bg-gradient-to-tr from-rosa/50 via-rosaSuave/40 to-white rounded-[2.5rem] blur-xl -z-10"></div>
+
+            <!-- Contenedor estilo pantalla de app -->
+            <div class="bg-crema rounded-[2rem] border-4 border-white shadow-suave overflow-hidden">
+              <!-- Barra superior simulada de la app -->
+              <div class="bg-rosa px-5 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-marron/70"></span>
+                  <span class="font-extrabold text-marron text-base">Pompis</span>
+                </div>
+                <span class="text-xs font-bold text-marron bg-white/60 px-2.5 py-1 rounded-full">
+                  Ordenado por €/ud
+                </span>
+              </div>
+
+              <!-- Mini filtro interactivo de demostración -->
+              <div class="px-4 pt-4 pb-2 flex items-center gap-2">
+                <button type="button" data-filter="panales" class="preview-tab px-3.5 py-1.5 rounded-full text-xs font-bold bg-marron text-crema transition-colors cursor-pointer">
+                  Pañales
+                </button>
+                <button type="button" data-filter="toallitas" class="preview-tab px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-marron border border-rosa/50 hover:bg-rosaSuave transition-colors cursor-pointer">
+                  Toallitas
+                </button>
+              </div>
+
+              <!-- Lista de tarjetas de ejemplo (Pañales) -->
+              <div id="preview-panales" class="p-4 space-y-3">
+                <!-- Tarjeta 1: Mejor precio (¡Ganga!) -->
+                <div class="bg-white rounded-2xl p-4 shadow-tarjeta border-2 border-verdeAhorro/30 flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-11 h-11 rounded-xl bg-verdeFondo text-verdeAhorro flex items-center justify-center shrink-0">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-bold text-marron text-sm sm:text-base truncate">Chelino Nature</p>
+                      <p class="text-xs text-marronClaro">Atida • Talla 4</p>
+                    </div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <p class="text-lg font-extrabold text-marron leading-none">0,12€<span class="text-xs font-semibold text-marronClaro">/ud</span></p>
+                    <span class="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-verdeFondo text-verdeAhorro text-[11px] font-extrabold">
+                      ¡Ganga!
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="bg-white rounded-2xl p-4 shadow-tarjeta border border-rosa/20 flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-11 h-11 rounded-xl bg-rosaSuave text-marron flex items-center justify-center shrink-0">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-bold text-marron text-sm sm:text-base truncate">Huggies Ultra Comfort</p>
+                      <p class="text-xs text-marronClaro">Amazon • Talla 3</p>
+                    </div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <p class="text-lg font-extrabold text-marron leading-none">0,15€<span class="text-xs font-semibold text-marronClaro">/ud</span></p>
+                    <p class="text-[11px] text-marronClaro mt-1">por unidad</p>
+                  </div>
+                </div>
+
+                <!-- Tarjeta 3 -->
+                <div class="bg-white rounded-2xl p-4 shadow-tarjeta border border-rosa/20 flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-11 h-11 rounded-xl bg-rosaSuave text-marron flex items-center justify-center shrink-0">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-bold text-marron text-sm sm:text-base truncate">Dodot Sensitive</p>
+                      <p class="text-xs text-marronClaro">PromoFarma • Talla 2</p>
+                    </div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <p class="text-lg font-extrabold text-marron leading-none">0,18€<span class="text-xs font-semibold text-marronClaro">/ud</span></p>
+                    <p class="text-[11px] text-marronClaro mt-1">por unidad</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lista de tarjetas de ejemplo (Toallitas - oculta por defecto) -->
+              <div id="preview-toallitas" class="hidden p-4 space-y-3">
+                <div class="bg-white rounded-2xl p-4 shadow-tarjeta border-2 border-verdeAhorro/30 flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-11 h-11 rounded-xl bg-verdeFondo text-verdeAhorro flex items-center justify-center shrink-0">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-bold text-marron text-sm sm:text-base truncate">Dodot Aqua Pure</p>
+                      <p class="text-xs text-marronClaro">Amazon • Pack 48 uds</p>
+                    </div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <p class="text-lg font-extrabold text-marron leading-none">0,04€<span class="text-xs font-semibold text-marronClaro">/ud</span></p>
+                    <span class="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-verdeFondo text-verdeAhorro text-[11px] font-extrabold">
+                      ¡Ganga!
+                    </span>
+                  </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-4 shadow-tarjeta border border-rosa/20 flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-11 h-11 rounded-xl bg-rosaSuave text-marron flex items-center justify-center shrink-0">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                      </svg>
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-bold text-marron text-sm sm:text-base truncate">WaterWipes Original</p>
+                      <p class="text-xs text-marronClaro">PromoFarma • Pack 60 uds</p>
+                    </div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <p class="text-lg font-extrabold text-marron leading-none">0,05€<span class="text-xs font-semibold text-marronClaro">/ud</span></p>
+                    <p class="text-[11px] text-marronClaro mt-1">por unidad</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pie de la vista previa -->
+              <div class="px-5 py-3 bg-white/70 border-t border-rosa/20 text-center">
+                <p class="text-[11px] text-marronClaro">
+                  Precios de ejemplo • Actualización automática en la app
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= 3 BLOQUES DE BENEFICIOS ================= -->
+    <section class="bg-white/70 border-y border-rosa/30 py-16 sm:py-20">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-marron mb-3">
+            Pensado para padres con poco tiempo
+          </h2>
+          <p class="text-marronClaro text-sm sm:text-base">
+            Directo al grano: ves la oferta más barata arriba del todo y compras en tu tienda habitual.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <!-- Beneficio 1 -->
+          <div class="bg-crema rounded-3xl p-6 sm:p-8 border border-rosa/40 shadow-tarjeta">
+            <div class="w-12 h-12 rounded-2xl bg-verdeFondo text-verdeAhorro flex items-center justify-center mb-5">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-marron mb-2">Precio real por unidad</h3>
+            <p class="text-sm text-marronClaro leading-relaxed">
+              Dividimos el precio de cada pack entre sus unidades para que sepas de verdad qué oferta compensa, sin trucos de tamaño.
+            </p>
+          </div>
+
+          <!-- Beneficio 2 -->
+          <div class="bg-crema rounded-3xl p-6 sm:p-8 border border-rosa/40 shadow-tarjeta">
+            <div class="w-12 h-12 rounded-2xl bg-rosaSuave text-marron flex items-center justify-center mb-5">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-marron mb-2">Todas tus tiendas en un sitio</h3>
+            <p class="text-sm text-marronClaro leading-relaxed">
+              Comparamos Amazon, PromoFarma, Atida, Carrefour y más tiendas de España para que compres siempre en tu comercio habitual al mejor precio.
+            </p>
+          </div>
+
+          <!-- Beneficio 3 -->
+          <div class="bg-crema rounded-3xl p-6 sm:p-8 border border-rosa/40 shadow-tarjeta">
+            <div class="w-12 h-12 rounded-2xl bg-doradoClaro/40 text-marron flex items-center justify-center mb-5">
+              <svg class="w-6 h-6 text-dorado" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-marron mb-2">Alertas de chollos</h3>
+            <p class="text-sm text-marronClaro leading-relaxed">
+              Filtra por pañales o toallitas y por la talla exacta de tu bebé para detectar al instante la etiqueta ¡Ganga! antes de que vuele el stock.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-crema py-10 sm:py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-rosa/30">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-rosa flex items-center justify-center shadow-sm border border-marron/10">
+            <!-- Logotipo SVG: Carita de bebé con moneda dorada (€) versión footer -->
+            <svg class="w-8 h-8" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="6.5" cy="24" r="3" fill="#FFE8DC" stroke="#5D4037" stroke-width="2.2"/>
+              <circle cx="33.5" cy="24" r="3" fill="#FFE8DC" stroke="#5D4037" stroke-width="2.2"/>
+              <circle cx="20" cy="24" r="13.5" fill="#FFE8DC" stroke="#5D4037" stroke-width="2.3"/>
+              <path d="M17.5 10.6C16.6 5.4 24.4 5 23 9.8C22.2 11.4 20 10.8 20.8 9" stroke="#5D4037" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M13.5 23Q15.5 20.5 17.5 23" stroke="#5D4037" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              <path d="M22.5 23Q24.5 20.5 26.5 23" stroke="#5D4037" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+              <ellipse cx="11.8" cy="26.5" rx="2.3" ry="1.4" fill="#FFB6C1"/>
+              <ellipse cx="28.2" cy="26.5" rx="2.3" ry="1.4" fill="#FFB6C1"/>
+              <path d="M16.8 28.2Q20 31.6 23.2 28.2" stroke="#5D4037" stroke-width="2.1" stroke-linecap="round" fill="none"/>
+              <circle cx="35.5" cy="34.5" r="9.5" fill="url(#monedaGradFooter)" stroke="#5D4037" stroke-width="2.1"/>
+              <text x="35.5" y="38.5" text-anchor="middle" fill="#5D4037" font-family="Inter, sans-serif" font-weight="800" font-size="11.5">€</text>
+              <defs>
+                <linearGradient id="monedaGradFooter" x1="27" y1="26" x2="44" y2="43" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FDE047"/>
+                  <stop offset="1" stop-color="#F59E0B"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="font-extrabold text-marron text-lg">Pompis</span>
+          <span class="text-xs text-marronClaro">• Próximamente en iOS y Android</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-semibold text-marronClaro">
+          <span class="px-3 py-1 rounded-full bg-white border border-rosa/40">App Store (Pronto)</span>
+          <span class="px-3 py-1 rounded-full bg-white border border-rosa/40">Google Play (Pronto)</span>
+        </div>
+      </div>
+
+      <!-- Aviso legal para redes de afiliación -->
+      <div class="pt-6 text-xs text-marronClaro/80 leading-relaxed space-y-2 text-center sm:text-left">
+        <p>
+          <strong>Transparencia y afiliación:</strong> En calidad de Afiliado de Amazon y otras redes, Pompis obtiene ingresos por las compras adscritas que cumplen los requisitos aplicables, sin coste adicional para ti. Pompis es un comparador independiente de precios en tiendas de España como Amazon, PromoFarma, Atida y Carrefour.
+        </p>
+        <p>
+          © 2026 Pompis. Todos los derechos reservados. Los precios y la disponibilidad de los productos pueden variar en la tienda de destino.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT INTERACTIVO ================= -->
+  <script>
+    // =========================================================================
+    // Pega aquí tus credenciales reales de Supabase (las mismas de main.dart)
+    // =========================================================================
+    const SUPABASE_URL = 'https://gaokdumpodqzllpskmjb.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_RDSmDVuGBOcILwR0-agLTA_6nXx8XOF';
+
+    const esModoPrueba =
+      SUPABASE_URL.includes('TU_SUPABASE_URL') || SUPABASE_ANON_KEY.includes('TU_SUPABASE_ANON_KEY');
+
+    // Inicializamos el cliente solo si ya se han pegado las claves reales
+    const supabaseClient =
+      !esModoPrueba && window.supabase
+        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        : null;
+
+    // 1. Gestión del formulario de lista de espera conectado a Supabase
+    const form = document.getElementById('waitlist-form');
+    const emailInput = document.getElementById('email-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const feedback = document.getElementById('form-feedback');
+
+    function mostrarMensaje(html, tipo) {
+      const estilos = {
+        exito: 'bg-verdeFondo text-verdeAhorro border border-verdeAhorro/30',
+        aviso: 'bg-doradoClaro/30 text-marron border border-dorado/50',
+        error: 'bg-rosaSuave text-marron border border-rosa',
+      };
+      feedback.innerHTML = html;
+      feedback.className = 'mt-3 p-3.5 rounded-2xl text-sm font-medium text-left transition-all ' + (estilos[tipo] || estilos.aviso);
+    }
+
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const email = emailInput.value.trim().toLowerCase();
+      const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!emailValido) {
+        mostrarMensaje('Por favor, introduce un correo electrónico válido.', 'error');
+        emailInput.focus();
+        return;
+      }
+
+      // Modo vista previa si aún no se han pegado las claves reales
+      if (esModoPrueba || !supabaseClient) {
+        mostrarMensaje(
+          '<strong>Modo prueba:</strong> el correo <strong>' +
+            email.replace(/</g, '&lt;') +
+            '</strong> es válido. Se guardará automáticamente en Supabase en cuanto pegues tus claves en <code>index.html</code>.',
+          'aviso'
+        );
+        emailInput.value = '';
+        return;
+      }
+
+      // Estado de carga
+      const textoOriginal = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Guardando...';
+
+      try {
+        const { error } = await supabaseClient
+          .from('lista_espera')
+          .insert([{ email }]);
+
+        if (error) {
+          // Código 23505 de PostgreSQL = violación de restricción UNIQUE (correo duplicado)
+          if (error.code === '23505') {
+            mostrarMensaje('<strong>¡Ya estabas en la lista!</strong> Te avisaremos en cuanto lancemos.', 'aviso');
+          } else {
+            console.error('Error Supabase:', error);
+            mostrarMensaje('No pudimos guardar tu correo ahora mismo. Inténtalo de nuevo en unos minutos.', 'error');
+          }
+          return;
+        }
+
+        // Éxito
+        mostrarMensaje('<strong>¡Apuntado!</strong> Te avisaremos en cuanto lancemos Pompis.', 'exito');
+        emailInput.value = '';
+      } catch (err) {
+        console.error('Error de red:', err);
+        mostrarMensaje('Error de conexión con el servidor. Comprueba tu internet e inténtalo de nuevo.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = textoOriginal;
+      }
+    });
+
+    // 2. Selector interactivo de la vista previa (Pañales / Toallitas)
+    const tabButtons = document.querySelectorAll('.preview-tab');
+    const listPanales = document.getElementById('preview-panales');
+    const listToallitas = document.getElementById('preview-toallitas');
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.getAttribute('data-filter');
+
+        tabButtons.forEach((b) => {
+          b.classList.remove('bg-marron', 'text-crema');
+          b.classList.add('bg-white', 'text-marron', 'border', 'border-rosa/50');
+        });
+
+        btn.classList.add('bg-marron', 'text-crema');
+        btn.classList.remove('bg-white', 'text-marron', 'border', 'border-rosa/50');
+
+        if (filter === 'panales') {
+          listPanales.classList.remove('hidden');
+          listToallitas.classList.add('hidden');
+        } else {
+          listPanales.classList.add('hidden');
+          listToallitas.classList.remove('hidden');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
